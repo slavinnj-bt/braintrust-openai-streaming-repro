@@ -1,8 +1,8 @@
 # Braintrust Streaming Repro
 
-Reproduces: `AttributeError: 'LegacyAPIResponse' object has no attribute '_iterator'`
+Attempts to reproduce: `AttributeError: 'LegacyAPIResponse' object has no attribute '_iterator'`
 
-Observed in production on Modal with `braintrust==0.10.0rc16` + `openai>=2.0.0` + sync `OpenAI` client + `stream=True`. The issue does not reproduce locally, suggesting it is triggered by HTTP/2 negotiation in cloud network environments where `h2` is available.
+Observed in production on Modal with `braintrust==0.10.0rc16` + `openai>=2.0.0` + sync `OpenAI` client + `stream=True`. **Neither the local nor Modal repro successfully reproduces the issue.** `braintrust==0.10.0rc16` appears to handle streaming correctly in both environments tested.
 
 ## Environment
 
@@ -22,7 +22,7 @@ export BRAINTRUST_API_KEY=...
 python repro_sync.py
 ```
 
-Note: the issue has not been reproduced locally. Running `repro_sync.py` locally may succeed.
+Note: this does not reproduce the issue in current testing — streaming completes successfully.
 
 ## Modal repro
 
@@ -49,6 +49,8 @@ modal run repro_modal.py
 The Modal script tests two variants:
 - **Variant A** — default httpx client (no explicit HTTP/2), matches customer's production code exactly
 - **Variant B** — explicit `httpx.Client(http2=True)`, tests whether HTTP/2 negotiation is the trigger
+
+Note: both variants completed successfully in testing — the issue did not reproduce on Modal either.
 
 ## Root cause hypothesis
 
